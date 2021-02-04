@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'buttons.dart';
+
 import 'CList.dart';
+import 'buttons.dart';
 
 void main() => runApp(TabsApp());
 
@@ -9,13 +10,22 @@ class TabsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'TODO',
-      theme: ThemeData(primarySwatch: Colors.amber),
+      theme: ThemeData(
+        primarySwatch: Colors.amber,
+      ),
       home: HomePage(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<String> list = ['s1', 's2'];
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -55,19 +65,23 @@ class HomePage extends StatelessWidget {
             children: [
               ListView(
                 children: [
-                  ListTile(
-                    title: Text('Text1'),
-                  ),
-                  ListTile(
-                    title: Text('Text2'),
-                  )
+                  for (var item in list)
+                    ListTile(
+                      title: Text(item),
+                    ),
                 ],
               ),
               TList(),
               Text('tab3...'),
             ],
           ),
-          floatingActionButton: AddButton()),
+          floatingActionButton: AddButton(
+            callback: (e) {
+              setState(() {
+                list.add(e);
+              });
+            },
+          )),
     );
   }
 }

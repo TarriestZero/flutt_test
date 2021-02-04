@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'CList.dart';
 
 class MyForm extends StatefulWidget {
   @override
@@ -42,7 +41,7 @@ class MyFormState extends State {
                         backgroundColor: Colors.green,
                       ));
                       print(myController.text); // запись в list
-
+                      Navigator.pop(context, myController.text);
                     }
                   },
                   child: Text('Проверить'),
