@@ -24,7 +24,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<String> list = ['s1', 's2'];
+  refresh() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.only(right: 20.0),
                   child: GestureDetector(
                     onTap: () {
-                      print('press refresh');
+                      setState(() {});
                     },
                     child: Icon(
                       Icons.refresh,
@@ -65,20 +67,51 @@ class _HomePageState extends State<HomePage> {
             children: [
               ListView(
                 children: [
-                  for (var item in list)
+                  for (var item in tasks.started_list)
                     ListTile(
                       title: Text(item),
                     ),
+                  Row(
+                    textDirection: TextDirection.ltr,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text('some tex1'),
+                      Text('Some text2'),
+                    ],
+                  )
                 ],
               ),
-              TList(),
-              Text('tab3...'),
+              Column(
+                children: [
+                  ...tasks.progress_list,
+                ],
+              ),
+
+              // ListView.builder(
+              //     itemCount: 1,
+              //     itemBuilder: (context, i) {
+              //       return Card(
+              //         child: Container(child: progress_list[0]),
+              //       );
+              //     })),
+              Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    color: Colors.black12,
+                    child: Text('Checkkkk'),
+                  )
+                ],
+              )
             ],
           ),
           floatingActionButton: AddButton(
             callback: (e) {
               setState(() {
-                list.add(e);
+                tasks.progress_list.add(new TList(
+                  e,
+                  notifyParent: refresh,
+                ));
               });
             },
           )),
