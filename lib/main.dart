@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.only(right: 20.0),
                   child: GestureDetector(
                     onTap: () {
+                      print('refresh');
                       setState(() {});
                     },
                     child: Icon(
@@ -65,20 +66,9 @@ class _HomePageState extends State<HomePage> {
           ),
           body: TabBarView(
             children: [
-              ListView(
+              Column(
                 children: [
-                  for (var item in tasks.started_list)
-                    ListTile(
-                      title: Text(item),
-                    ),
-                  Row(
-                    textDirection: TextDirection.ltr,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text('some tex1'),
-                      Text('Some text2'),
-                    ],
-                  )
+                  ...tasks.started_list,
                 ],
               ),
               Column(
@@ -86,21 +76,9 @@ class _HomePageState extends State<HomePage> {
                   ...tasks.progress_list,
                 ],
               ),
-
-              // ListView.builder(
-              //     itemCount: 1,
-              //     itemBuilder: (context, i) {
-              //       return Card(
-              //         child: Container(child: progress_list[0]),
-              //       );
-              //     })),
               Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    color: Colors.black12,
-                    child: Text('Checkkkk'),
-                  )
+                  ...tasks.complete_list,
                 ],
               )
             ],
@@ -108,7 +86,7 @@ class _HomePageState extends State<HomePage> {
           floatingActionButton: AddButton(
             callback: (e) {
               setState(() {
-                tasks.progress_list.add(new TList(
+                tasks.started_list.add(new TList(
                   e,
                   notifyParent: refresh,
                 ));

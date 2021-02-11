@@ -1,19 +1,42 @@
 import 'package:flutter/material.dart';
 
 class Storages {
-  List<String> started_list = ['s1', 's2'];
+  List<TList> started_list = [];
   List<TList> progress_list = [];
-  List<String> complete_list = ['s1', 's2'];
+  List<TList> complete_list = [];
 }
 
 Storages tasks = Storages();
 
 class TList extends StatelessWidget {
   final String data;
-
   final Function() notifyParent;
 
+  var map = const <int, String>{
+    0: 'In progress',
+    1: 'Complete',
+  };
+
   TList(this.data, {Key key, @required this.notifyParent}) : super(key: key);
+
+  void change_list(int k) {
+    if (k == 0) {
+      tasks.progress_list.add(new PList(data, notifyParent));
+    } else {
+      tasks.complete_list.add(new CList(data, notifyParent));
+    }
+    delete();
+  } // перемещение в другой лист
+
+  void delete() {
+    for (var i = 0; i < tasks.started_list.length; i++) {
+      if (tasks.started_list[i].data == data) {
+        print('Delete - ' + tasks.started_list[i].data);
+        tasks.started_list.removeAt(i);
+        notifyParent();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,26 +57,25 @@ class TList extends StatelessWidget {
                   children: [
                     GestureDetector(
                         onTap: () {
-                          print('check');
+                          change_list(0);
+                          notifyParent();
                         },
                         child: Text(
-                          'Not start',
+                          map[0],
                           style: TextStyle(color: Colors.blueAccent),
                         )),
                     GestureDetector(
+                        onTap: () {
+                          change_list(1);
+                          notifyParent();
+                        },
                         child: Text(
-                      'Complete',
-                      style: TextStyle(color: Colors.blueAccent),
-                    )),
+                          map[1],
+                          style: TextStyle(color: Colors.blueAccent),
+                        )),
                     GestureDetector(
                         onTap: () {
-                          for (var i = 0; i < tasks.progress_list.length; i++) {
-                            if (tasks.progress_list[i].data == data) {
-                              print('Delete - ' + tasks.progress_list[i].data);
-                              tasks.progress_list.removeAt(i);
-                              notifyParent();
-                            }
-                          }
+                          delete();
                         },
                         child: Text(
                           'Delete',
@@ -64,11 +86,67 @@ class TList extends StatelessWidget {
               ])),
             )));
   }
+}
 
-  // List<Widget> _buildList(context) {
-  //   return data.map((Text e) => ListTile(title: e..data
-  //       //Theme.of(context).primaryColor,
-  //       )).toList();
-  // }
+class PList extends TList {
+  @override
+  var map = const <int, String>{
+    0: 'Not started',
+    1: 'Complete',
+  };
 
+  PList(data, notifyParent) : super(data, notifyParent: notifyParent);
+
+  @override
+  void change_list(int k) {
+    if (k == 0) {
+      tasks.started_list.add(new TList(data, notifyParent: notifyParent));
+    } else {
+      tasks.complete_list.add(new TList(data, notifyParent: notifyParent));
+    }
+    delete();
+  } // перемещение в другой лист
+
+  @override
+  void delete() {
+    for (var i = 0; i < tasks.progress_list.length; i++) {
+      if (tasks.progress_list[i].data == data) {
+        print('Delete - ' + tasks.progress_list[i].data);
+        tasks.progress_list.removeAt(i);
+        notifyParent();
+      }
+    }
+  }
+}
+
+class CList extends TList {
+  
+  @override
+  var map = const <int, String>{
+    0: 'Not started',
+    1: 'In progress',
+  };
+
+  CList(data, notifyParent) : super(data, notifyParent: notifyParent);
+
+  @override
+  void change_list(int k) {
+    if (k == 0) {
+      tasks.started_list.add(new TList(data, notifyParent: notifyParent));
+    } else {
+      tasks.progress_list.add(new PList(data, notifyParent));
+    }
+    delete();
+  } // перемещение в другой лист
+
+  @override
+  void delete() {
+    for (var i = 0; i < tasks.complete_list.length; i++) {
+      if (tasks.complete_list[i].data == data) {
+        print('Delete - ' + tasks.complete_list[i].data);
+        tasks.complete_list.removeAt(i);
+        notifyParent();
+      }
+    }
+  }
 }
