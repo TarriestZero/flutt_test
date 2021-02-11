@@ -68,17 +68,41 @@ class _HomePageState extends State<HomePage> {
             children: [
               Column(
                 children: [
-                  ...tasks.started_list,
+                  if (tasks.started_list.length > 0) ...tasks.started_list,
+                  if (tasks.started_list.length == 0)
+                    Container(
+                        margin: EdgeInsets.only(top: 150),
+                        child: Text(
+                          'Items not found \n Tap "+" to create new one',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 25),
+                        ))
                 ],
               ),
               Column(
                 children: [
-                  ...tasks.progress_list,
+                  if (tasks.progress_list.length > 0) ...tasks.progress_list,
+                  if (tasks.progress_list.length == 0)
+                    Container(
+                        margin: EdgeInsets.only(top: 150),
+                        child: Text(
+                          'No one in progress',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 25),
+                        ))
                 ],
               ),
               Column(
                 children: [
-                  ...tasks.complete_list,
+                  if (tasks.complete_list.length > 0) ...tasks.complete_list,
+                  if (tasks.complete_list.length == 0)
+                    Container(
+                        margin: EdgeInsets.only(top: 150),
+                        child: Text(
+                          'No one complete',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 25),
+                        ))
                 ],
               )
             ],
