@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Storages {
   List<TList> started_list = [];
@@ -12,29 +14,82 @@ Storages tasks = Storages();
 class TList extends StatelessWidget {
   final String data;
   final Function() notifyParent;
+  bool delStatus = false;
 
   var map = const <int, String>{
-    0: 'In progress',
-    1: 'Complete',
+    0: 'In Progress',
+    1: 'Completed',
   };
 
   TList(this.data, {Key key, @required this.notifyParent}) : super(key: key);
 
+  change_in_server(String step) async {
+    String url = tasks.url + '/item/update';
+    String body;
+    int status;
+
+    try {
+      var response = await http.put(url,
+          body: jsonEncode({'item': data, 'status': step}),
+          headers: {'Content-Type': 'application/json'});
+
+      status = response.statusCode;
+      body = response.body;
+    } catch (error) {
+      status = 0;
+      body = error.toString();
+    }
+    print('status code -- $status');
+    print('Body -- $body');
+    return status;
+  }
+
   void change_list(int k) {
     if (k == 0) {
-      tasks.progress_list.add(new PList(data, notifyParent));
+      if (change_in_server(map[k]) != 0)
+        tasks.progress_list.add(new PList(data, notifyParent));
     } else {
-      tasks.complete_list.add(new CList(data, notifyParent));
+      if (change_in_server(map[k]) != 0)
+        tasks.complete_list.add(new CList(data, notifyParent));
     }
     delete();
   } // перемещение в другой лист
+
+  del_from_serv(String task) async {
+    String url = tasks.url + '/item/remove';
+    String body;
+    int status;
+    try {
+      var response = await http.post(url,
+          body: jsonEncode({'item': task}),
+          headers: {'Content-Type': 'application/json'});
+
+      status = response.statusCode;
+      body = response.body;
+    } catch (error) {
+      status = 0;
+      body = error.toString();
+    }
+    print('status code -- $status');
+    print('Body -- $body');
+    return status;
+  }
 
   void delete() {
     for (var i = 0; i < tasks.started_list.length; i++) {
       if (tasks.started_list[i].data == data) {
         print('Delete - ' + tasks.started_list[i].data);
-        tasks.started_list.removeAt(i);
-        notifyParent();
+        if (delStatus) {
+          // если мы полностью удалаем задачу
+          if (del_from_serv(data) != 0) {
+            tasks.started_list.removeAt(i);
+            notifyParent();
+          }
+        } else {
+          // если перемещаем задачу
+          tasks.started_list.removeAt(i);
+          notifyParent();
+        }
       }
     }
   }
@@ -76,6 +131,7 @@ class TList extends StatelessWidget {
                         )),
                     GestureDetector(
                         onTap: () {
+                          delStatus = true;
                           delete();
                         },
                         child: Text(
@@ -92,8 +148,8 @@ class TList extends StatelessWidget {
 class PList extends TList {
   @override
   var map = const <int, String>{
-    0: 'Not started',
-    1: 'Complete',
+    0: 'Not Started',
+    1: 'Completed',
   };
 
   PList(data, notifyParent) : super(data, notifyParent: notifyParent);
@@ -101,9 +157,11 @@ class PList extends TList {
   @override
   void change_list(int k) {
     if (k == 0) {
-      tasks.started_list.add(new TList(data, notifyParent: notifyParent));
+      if (change_in_server(map[k]) != 0)
+        tasks.started_list.add(new TList(data, notifyParent: notifyParent));
     } else {
-      tasks.complete_list.add(new TList(data, notifyParent: notifyParent));
+      if (change_in_server(map[k]) != 0)
+        tasks.complete_list.add(new TList(data, notifyParent: notifyParent));
     }
     delete();
   } // перемещение в другой лист
@@ -113,8 +171,15 @@ class PList extends TList {
     for (var i = 0; i < tasks.progress_list.length; i++) {
       if (tasks.progress_list[i].data == data) {
         print('Delete - ' + tasks.progress_list[i].data);
-        tasks.progress_list.removeAt(i);
-        notifyParent();
+        if (delStatus) {
+          if (del_from_serv(data) != 0) {
+            tasks.progress_list.removeAt(i);
+            notifyParent();
+          }
+        } else {
+          tasks.progress_list.removeAt(i);
+          notifyParent();
+        }
       }
     }
   }
@@ -123,8 +188,8 @@ class PList extends TList {
 class CList extends TList {
   @override
   var map = const <int, String>{
-    0: 'Not started',
-    1: 'In progress',
+    0: 'Not Started',
+    1: 'In Progress',
   };
 
   CList(data, notifyParent) : super(data, notifyParent: notifyParent);
@@ -132,9 +197,11 @@ class CList extends TList {
   @override
   void change_list(int k) {
     if (k == 0) {
-      tasks.started_list.add(new TList(data, notifyParent: notifyParent));
+      if (change_in_server(map[k]) != 0)
+        tasks.started_list.add(new TList(data, notifyParent: notifyParent));
     } else {
-      tasks.progress_list.add(new PList(data, notifyParent));
+      if (change_in_server(map[k]) != 0)
+        tasks.progress_list.add(new PList(data, notifyParent));
     }
     delete();
   } // перемещение в другой лист
@@ -144,8 +211,15 @@ class CList extends TList {
     for (var i = 0; i < tasks.complete_list.length; i++) {
       if (tasks.complete_list[i].data == data) {
         print('Delete - ' + tasks.complete_list[i].data);
-        tasks.complete_list.removeAt(i);
-        notifyParent();
+        if (delStatus) {
+          if (del_from_serv(data) != 0) {
+            tasks.complete_list.removeAt(i);
+            notifyParent();
+          }
+        } else {
+          tasks.complete_list.removeAt(i);
+          notifyParent();
+        }
       }
     }
   }

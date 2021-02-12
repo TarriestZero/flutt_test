@@ -40,6 +40,13 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
+  bool check_exist(List<TList> listtask, String task) {
+    for (var item in listtask) {
+      if (item.data == task) return false;
+    }
+    return true;
+  }
+
   @override
   void initState() {
     _url = widget.url;
@@ -80,15 +87,18 @@ class _HomePageState extends State<HomePage> {
       for (var item in map['items']) {
         if (item[1] == 'Not Started') {
           print(item[0]);
-          tasks.started_list.add(new TList(item[0], notifyParent: refresh));
+          if (check_exist(tasks.started_list, item[0]))
+            tasks.started_list.add(new TList(item[0], notifyParent: refresh));
         }
         if (item[1] == 'In Progress') {
           print(item[0]);
-          tasks.progress_list.add(new PList(item[0], refresh));
+          if (check_exist(tasks.progress_list, item[0]))
+            tasks.progress_list.add(new PList(item[0], refresh));
         }
         if (item[1] == 'Completed') {
           print(item[0]);
-          tasks.complete_list.add(new CList(item[0], refresh));
+          if (check_exist(tasks.complete_list, item[0]))
+            tasks.complete_list.add(new CList(item[0], refresh));
         }
       }
       setState(() {});
@@ -115,6 +125,9 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.only(right: 20.0),
                   child: GestureDetector(
                     onTap: () {
+                      tasks.progress_list.clear();
+                      tasks.started_list.clear();
+                      tasks.complete_list.clear();
                       print('refresh');
                       _getTasks();
                     },
