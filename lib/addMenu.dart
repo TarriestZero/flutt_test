@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_check/CList.dart';
 
 class MyForm extends StatefulWidget {
   @override
@@ -8,6 +9,19 @@ class MyForm extends StatefulWidget {
 class MyFormState extends State {
   final _formKey = GlobalKey<FormState>();
   final myController = TextEditingController();
+
+  bool _checkRepeat(String text) {
+    for (var item in tasks.started_list) {
+      if (item.data == text) return false;
+    }
+    for (var item in tasks.progress_list) {
+      if (item.data == text) return false;
+    }
+    for (var item in tasks.complete_list) {
+      if (item.data == text) return false;
+    }
+    return true;
+  }
 
   @override
   void dispose() {
@@ -36,12 +50,19 @@ class MyFormState extends State {
                 new RaisedButton(
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text('Форма успешно заполнена'),
-                        backgroundColor: Colors.green,
-                      ));
-                      print(myController.text); // запись в list
-                      Navigator.pop(context, myController.text);
+                      if (_checkRepeat(myController.text)) {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text('Форма успешно заполнена'),
+                          backgroundColor: Colors.green,
+                        ));
+                        print(myController.text); // запись в list
+                        Navigator.pop(context, myController.text);
+                      } else {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text('Такая задача существует'),
+                          backgroundColor: Colors.red,
+                        ));
+                      }
                     }
                   },
                   child: Text('Проверить'),

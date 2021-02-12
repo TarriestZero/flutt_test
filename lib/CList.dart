@@ -4,6 +4,7 @@ class Storages {
   List<TList> started_list = [];
   List<TList> progress_list = [];
   List<TList> complete_list = [];
+  String url = 'http://65.21.6.142:8822';
 }
 
 Storages tasks = Storages();
@@ -120,7 +121,6 @@ class PList extends TList {
 }
 
 class CList extends TList {
-  
   @override
   var map = const <int, String>{
     0: 'Not started',
