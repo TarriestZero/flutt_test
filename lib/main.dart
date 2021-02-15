@@ -16,18 +16,12 @@ class TabsApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.amber,
       ),
-      home: HomePage(
-        url: 'http://65.21.6.142:8822',
-      ),
+      home: HomePage(),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  final String url;
-
-  HomePage({String url}) : url = url;
-
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -35,13 +29,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _url, _body;
   int _status;
+  bool _saving = false;
 
+  
   refresh() {
     setState(() {});
   }
 
   bool check_exist(List<TList> listtask, String task) {
+    // не известно, нужна ли еще
     for (var item in listtask) {
+      // -----------
       if (item.data == task) return false;
     }
     return true;
@@ -49,16 +47,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    _url = widget.url;
+    _url = tasks.url;
     _getTasks();
     super.initState();
     print(_url);
   }
 
   _sendRequestPostBodyHeaders(String task) async {
-    // if (_formKey.currentState.validate()) {
     String url = _url + '/item/new';
-    // _formKey.currentState.save(); //запуск функции
     try {
       var response = await http.post(url,
           body: jsonEncode({'item': task}),
@@ -73,7 +69,6 @@ class _HomePageState extends State<HomePage> {
     print('status code -- $_status');
     print('Body -- $_body');
     return _status;
-    // }
   }
 
   _getTasks() async {
@@ -153,7 +148,7 @@ class _HomePageState extends State<HomePage> {
           ),
           body: TabBarView(
             children: [
-              Column(
+              ListView(
                 children: [
                   if (tasks.started_list.length > 0) ...tasks.started_list,
                   if (tasks.started_list.length == 0)
@@ -166,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                         ))
                 ],
               ),
-              Column(
+              ListView(
                 children: [
                   if (tasks.progress_list.length > 0) ...tasks.progress_list,
                   if (tasks.progress_list.length == 0)
@@ -179,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                         ))
                 ],
               ),
-              Column(
+              ListView(
                 children: [
                   if (tasks.complete_list.length > 0) ...tasks.complete_list,
                   if (tasks.complete_list.length == 0)
@@ -191,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(fontSize: 25),
                         ))
                 ],
-              )
+              ),
             ],
           ),
           floatingActionButton: AddButton(
