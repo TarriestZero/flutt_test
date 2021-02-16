@@ -7,6 +7,7 @@ class Storages {
   List<TList> progress_list = [];
   List<TList> complete_list = [];
   String url = 'http://65.21.6.142:8822';
+  bool saving = false;
 }
 
 Storages tasks = Storages();
@@ -14,6 +15,7 @@ Storages tasks = Storages();
 class TList extends StatelessWidget {
   final String data;
   final Function() notifyParent;
+  
   bool delStatus = false;
 
   var map = const <int, String>{
@@ -27,7 +29,7 @@ class TList extends StatelessWidget {
     String url = tasks.url + '/item/update';
     String body;
     int status;
-
+    tasks.saving = true;
     try {
       var response = await http.put(url,
           body: jsonEncode({'item': data, 'status': step}),
@@ -59,6 +61,7 @@ class TList extends StatelessWidget {
     String url = tasks.url + '/item/remove';
     String body;
     int status;
+    tasks.saving = true;
     try {
       var response = await http.post(url,
           body: jsonEncode({'item': task}),
@@ -72,6 +75,7 @@ class TList extends StatelessWidget {
     }
     print('status code -- $status');
     print('Body -- $body');
+    tasks.saving = false;
     return status;
   }
 
@@ -92,13 +96,14 @@ class TList extends StatelessWidget {
         }
       }
     }
+    tasks.saving = false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
         child: SizedBox(
-            height: 100,
+            height: 100 + (8 * this.data.length / 34),
             child: Card(
               elevation: 2.0,
               margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -182,6 +187,7 @@ class PList extends TList {
         }
       }
     }
+    tasks.saving = false;
   }
 }
 
@@ -222,5 +228,6 @@ class CList extends TList {
         }
       }
     }
+    tasks.saving = false;
   }
 }
