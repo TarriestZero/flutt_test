@@ -84,17 +84,18 @@ class _HomePageState extends State<HomePage> {
         if (item[1] == 'Not Started') {
           print(item[0]);
           if (check_exist(tasks.started_list, item[0]))
-            tasks.started_list.add(new TList(item[0], notifyParent: refresh));
+            tasks.started_list.add(
+                new TList(item[0], notifyParent: refresh, dialog: _showDialog));
         }
         if (item[1] == 'In Progress') {
           print(item[0]);
           if (check_exist(tasks.progress_list, item[0]))
-            tasks.progress_list.add(new PList(item[0], refresh));
+            tasks.progress_list.add(new PList(item[0], refresh, _showDialog));
         }
         if (item[1] == 'Completed') {
           print(item[0]);
           if (check_exist(tasks.complete_list, item[0]))
-            tasks.complete_list.add(new CList(item[0], refresh));
+            tasks.complete_list.add(new CList(item[0], refresh, _showDialog));
         }
       }
       tasks.saving = false;
@@ -110,17 +111,16 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
 // user defined function
-  void _showDialog() {
+  _showDialog(String body, String status) {
     // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("Error"),
-          content: new Text(""),
+          title: new Text(body),
+          content: new Text("Error: " + status),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
@@ -134,7 +134,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +228,10 @@ class _HomePageState extends State<HomePage> {
                       tasks.started_list.add(new TList(
                         e,
                         notifyParent: refresh,
+                        dialog: _showDialog,
                       ));
+                    else
+                      _showDialog(_body, _status.toString());
                     tasks.saving = false;
                   });
                 },

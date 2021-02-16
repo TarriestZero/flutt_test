@@ -15,7 +15,7 @@ Storages tasks = Storages();
 class TList extends StatelessWidget {
   final String data;
   final Function() notifyParent;
-  
+  final Function(String, String) dialog;
   bool delStatus = false;
 
   var map = const <int, String>{
@@ -23,7 +23,9 @@ class TList extends StatelessWidget {
     1: 'Completed',
   };
 
-  TList(this.data, {Key key, @required this.notifyParent}) : super(key: key);
+  TList(this.data,
+      {Key key, @required this.notifyParent, @required this.dialog})
+      : super(key: key);
 
   change_in_server(String step) async {
     String url = tasks.url + '/item/update';
@@ -40,6 +42,7 @@ class TList extends StatelessWidget {
     } catch (error) {
       status = 0;
       body = error.toString();
+      dialog(body, status.toString());
     }
     print('status code -- $status');
     print('Body -- $body');
@@ -49,10 +52,10 @@ class TList extends StatelessWidget {
   void change_list(int k) {
     if (k == 0) {
       if (change_in_server(map[k]) != 0)
-        tasks.progress_list.add(new PList(data, notifyParent));
+        tasks.progress_list.add(new PList(data, notifyParent, dialog));
     } else {
       if (change_in_server(map[k]) != 0)
-        tasks.complete_list.add(new CList(data, notifyParent));
+        tasks.complete_list.add(new CList(data, notifyParent, dialog));
     }
     delete();
   } // перемещение в другой лист
@@ -72,6 +75,7 @@ class TList extends StatelessWidget {
     } catch (error) {
       status = 0;
       body = error.toString();
+      dialog(body, status.toString());
     }
     print('status code -- $status');
     print('Body -- $body');
@@ -157,16 +161,19 @@ class PList extends TList {
     1: 'Completed',
   };
 
-  PList(data, notifyParent) : super(data, notifyParent: notifyParent);
+  PList(data, notifyParent, dialog)
+      : super(data, notifyParent: notifyParent, dialog: dialog);
 
   @override
   void change_list(int k) {
     if (k == 0) {
       if (change_in_server(map[k]) != 0)
-        tasks.started_list.add(new TList(data, notifyParent: notifyParent));
+        tasks.started_list
+            .add(new TList(data, notifyParent: notifyParent, dialog: dialog));
     } else {
       if (change_in_server(map[k]) != 0)
-        tasks.complete_list.add(new TList(data, notifyParent: notifyParent));
+        tasks.complete_list
+            .add(new TList(data, notifyParent: notifyParent, dialog: dialog));
     }
     delete();
   } // перемещение в другой лист
@@ -198,16 +205,18 @@ class CList extends TList {
     1: 'In Progress',
   };
 
-  CList(data, notifyParent) : super(data, notifyParent: notifyParent);
+  CList(data, notifyParent, dialog)
+      : super(data, notifyParent: notifyParent, dialog: dialog);
 
   @override
   void change_list(int k) {
     if (k == 0) {
       if (change_in_server(map[k]) != 0)
-        tasks.started_list.add(new TList(data, notifyParent: notifyParent));
+        tasks.started_list
+            .add(new TList(data, notifyParent: notifyParent, dialog: dialog));
     } else {
       if (change_in_server(map[k]) != 0)
-        tasks.progress_list.add(new PList(data, notifyParent));
+        tasks.progress_list.add(new PList(data, notifyParent, dialog));
     }
     delete();
   } // перемещение в другой лист
